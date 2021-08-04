@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwinCAT - Startup Creator", "TwinCAT - Startup Creator\TwinCAT - Startup Creator.csproj", "{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM = Release|ARM
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|ARM.ActiveCfg = Debug|ARM
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|ARM.Build.0 = Debug|ARM
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|ARM.Deploy.0 = Debug|ARM
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|ARM64.Build.0 = Debug|ARM64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|x64.ActiveCfg = Debug|x64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|x64.Build.0 = Debug|x64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|x64.Deploy.0 = Debug|x64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|x86.ActiveCfg = Debug|x86
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|x86.Build.0 = Debug|x86
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Debug|x86.Deploy.0 = Debug|x86
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|ARM.ActiveCfg = Release|ARM
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|ARM.Build.0 = Release|ARM
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|ARM.Deploy.0 = Release|ARM
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|ARM64.ActiveCfg = Release|ARM64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|ARM64.Build.0 = Release|ARM64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|ARM64.Deploy.0 = Release|ARM64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|x64.ActiveCfg = Release|x64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|x64.Build.0 = Release|x64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|x64.Deploy.0 = Release|x64
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|x86.ActiveCfg = Release|x86
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|x86.Build.0 = Release|x86
+		{204C29D8-D1E1-4C0D-AA65-F1CFDBB5AF70}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8E5070A-62F8-43B8-AA51-A601E8348131}
+	EndGlobalSection
+EndGlobal
