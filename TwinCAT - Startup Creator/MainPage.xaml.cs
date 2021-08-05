@@ -2,22 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows;
+using Windows.UI.Popups;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -28,56 +18,59 @@ namespace TwinCAT___Startup_Creator
     /// </summary>
     public partial class MainPage : Page
     {
-        readonly ObservableCollection<string> ListOfTerminals = new ObservableCollection<string>();
+        readonly ObservableCollection<string> ListOfTerminals = new ObservableCollection<string>() { "EL7041", "Technosoft 8020" };
         string selectedTerminal;
         public XmlDocument xmlDoc;
         const string quoteMark = "\"";
+        private terminalParameter[] terminalParameterList = new terminalParameter[] { new terminalParameter(false, "Enc settings - Disable filter (0:False 1:True)", "PS", "0", "8000", "08") };
+        TerminalEL7041 testEL7041 = new TerminalEL7041();
 
-        Windows.Storage.StorageFolder installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
         Windows.Storage.StorageFolder folder;
 
         public MainPage()
         {
             this.InitializeComponent();
-            GenerateTerminalList();
-            
+            GenericTerminal genericTerminal = new GenericTerminal(terminalParameterList);
         }
 
+        private async void messageBoxPopup(string text2show)
+        {
+            var messageDialog = new MessageDialog(text2show);
+            await messageDialog.ShowAsync();
+        }
+
+        //TESTING CODE HERE
 
 
+        
 
-
-/// ////////////////////////////////////////////////////////
+        //TO HERE
+        /// ////////////////////////////////////////////////////////
         private async void generateStartupButton_Click(object sender, RoutedEventArgs e)
         {
-            List<string> startupString = new List<string>();
-       
+            if (folder==null)
+            {
+                messageBoxPopup("Select a save directory before generating file");
+                return;
+            }
+            List<string> startupString = new List<string>(); 
             selectedTerminal = terminalSelectionComboBox.SelectedItem.ToString();
             switch (selectedTerminal)
             {
                 case "EL7041":
-                    
                     EL7041 el7041Page = (EL7041)terminalFrame.Content;
-                    var x = el7041Page.TerminalEL7041;
-                    
-                    startupString = beckhoffBoilerPlateStart(startupString);
+                    TerminalEL7041 terminalEL7041 = el7041Page.TerminalEL7041;
 
-                    x.Reset();
-                    //foreach(terminalParameter parameter in terminalEL7041)
-                    foreach (terminalParameter param in x)
+                    startupString = beckhoffBoilerPlateStart(startupString);
+                    terminalEL7041.Reset();
+                    foreach (terminalParameter param in terminalEL7041)
                     {
-                        startupString.Add(param.Index);
-                        startupString.Add(param.Include.ToString());
                         if( param.Include)
                         {
                             startupString = beckhoffInitCmd(startupString, param);
-                            startupString.Add("Testing");
                         }
-                        
                     }
-
                     startupString = beckhoffBoilerPlateEnd(startupString);
-
                     Windows.Storage.StorageFile testFile = await folder.CreateFileAsync(fileName.Text + @".xml", Windows.Storage.CreationCollisionOption.ReplaceExisting);
                     await Windows.Storage.FileIO.WriteLinesAsync(testFile, startupString);
                     break;
@@ -106,7 +99,19 @@ namespace TwinCAT___Startup_Creator
             //SubIndex conversion here
             string decSubIndex = (Convert.ToInt64(parameter.SubIndex, 16)).ToString();
             //Data conversion here
+            string dataConversion = Convert.ToInt64(parameter.Data, 10).ToString("x4");
 
+            int dataLength = dataConversion.Length;
+            char[] flippedData = new char[dataLength];
+            for(int i=0; i<dataLength; i++)
+            {
+                flippedData[i] = dataConversion[dataLength -2- i];
+                flippedData[i + 1] = dataConversion[dataLength - 1 - i];
+                i++;
+            }
+            string chars2Str = new string(flippedData);
+            char c = dataConversion[1];
+            
 
             startupString.Add("\t\t\t<InitCmd>");
             startupString.Add("\t\t\t\t<Transition>" + parameter.Transition + "</Transition>");
@@ -115,9 +120,8 @@ namespace TwinCAT___Startup_Creator
             startupString.Add("\t\t\t\t<Comment>" + parameter.Name + "</Comment>");
             startupString.Add("\t\t\t\t<Index>" + decIndex+ "</Index>"); //this needs to be converted from HEX to DEC
             startupString.Add("\t\t\t\t<SubIndex>" + decSubIndex + "</SubIndex>"); //this needs to be converted from hex to DEC
-            startupString.Add("\t\t\t\t<Data>" + parameter.Data + "</Data>"); //this needs to be converted from DEC to LSB HEX
+            startupString.Add("\t\t\t\t<Data>" + chars2Str + "</Data>"); //this needs to be converted from DEC to LSB HEX
             startupString.Add("\t\t\t</InitCmd>");
-
             return startupString;
         }
 
@@ -127,40 +131,26 @@ namespace TwinCAT___Startup_Creator
 
 /////////////////////////////////////////////////////////////
 
-
-
-
-
-
-
-
-
-
-
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             selectedTerminal = terminalSelectionComboBox.SelectedItem.ToString();
             switch (selectedTerminal)
             {
                 case "EL7041":
-                    terminalFrame.Navigate(typeof(EL7041));
+                    terminalFrame.Navigate(typeof(EL7041),testEL7041);
                     break;
                 case "Technosoft 8020":
                     terminalFrame.Navigate(typeof(technosoft8020));
                     break;
-            }          
+            }
         }
 
-        private void GenerateTerminalList()
-        {
-            ListOfTerminals.Add("EL7041");
-            ListOfTerminals.Add("Technosoft 8020");
-        }
+        
 
 
         private async void folderSelectButton_Click(object sender, RoutedEventArgs e)
         {
-            var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+            Windows.Storage.Pickers.FolderPicker folderPicker = new Windows.Storage.Pickers.FolderPicker();
             folderPicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
             folderPicker.FileTypeFilter.Add("*");
             folder = await folderPicker.PickSingleFolderAsync();
@@ -170,7 +160,45 @@ namespace TwinCAT___Startup_Creator
             }
         }
     }
+
     
+
+
+    public class GenericTerminal : IEnumerator, IEnumerable
+    {
+        private terminalParameter[] _terminalParameterList;
+        int position = -1;
+
+        public GenericTerminal(terminalParameter[] terminalParameterList)
+        {
+            _terminalParameterList = terminalParameterList;
+        }
+        //IEnumerator and IEnumerable require these methods.
+        public IEnumerator GetEnumerator()
+        {
+            return (IEnumerator)this;
+        }
+        //IEnumerator
+        public bool MoveNext()
+        {
+            position++;
+            return (position < _terminalParameterList.Length);
+        }
+        //IEnumerable
+        public void Reset()
+        {
+            position = -1;
+        }
+        public object Current
+        {
+            get { return _terminalParameterList[position]; }
+        }
+        public object parameter(int paramIndex)
+        {
+            return _terminalParameterList[paramIndex];
+        }
+    }
+
 
 
     public class TerminalEL7041 : IEnumerator,IEnumerable
@@ -182,8 +210,26 @@ namespace TwinCAT___Startup_Creator
         {
             terminalParameterList = new terminalParameter[]
             {
-                new terminalParameter(true, "Test", "PS", "5000", "8011", "01"),
-                new terminalParameter(false, "Test2", "IP", "420", "8015", "0A")
+                new terminalParameter(false, "Enc settings - Disable filter (0:False 1:True)", "PS", "0", "8000","08"),
+                new terminalParameter(false, "Enc settings - Enable microincrements (0:False 1:True)","PS","0","8000","0A"),
+                new terminalParameter(false, "Enc settings - Reversion of rotation (0:False 1:True)","PS","0","8000","0E"),
+                new terminalParameter(true,"Motor Settings - Max current (mA)","PS","5000","8010","01"),
+                new terminalParameter(true,"Motor Settings - Reduced current (mA)","PS","2500","8010","02"),
+                new terminalParameter(true,"Motor Settings - Nominal voltage (mV)","PS","50000","8010","03"),
+                new terminalParameter(true,"Motor Settings - Coil resistance (0.01Ohm)","PS","100","8010","04"),
+                new terminalParameter(false,"Motor Settings - Motor EMF (###)","PS","0","8010","05"),
+                new terminalParameter(true,"Motor Settings - Fullsteps","PS","200","8010","06"),
+                new terminalParameter(false,"Motor Settings - Encoder Increments (4-fold)","PS","0","8010","07"),
+                new terminalParameter(false,"Controller Settings - Kp factor (curr) (###)","PS","400","8011","01"),
+                new terminalParameter(false,"Controller Settings - Ki factor (curr) (###)","PS","4","8011","02"),
+                new terminalParameter(false,"Controller Settings - Inner window (###)","PS","0","8011","03"),
+                new terminalParameter(false,"Controller Settings - Outer window (###)","PS","0","8011","05"),
+                new terminalParameter(false,"Controller Settings - Filter cut off frequency (###)","PS","0","8011","06"),
+                new terminalParameter(false,"Controller Settings - Ka factor (curr) (###)","PS","100","8011","07"),
+                new terminalParameter(false,"Controller Settings - Kd factor (curr) (###)","PS","100","8011","08"),
+                new terminalParameter(true,"Features - Speed Range (0:1k, 1:2k, 2:4k, 3:8k, 4:16k, 5:32k)","PS","1","8012","05"),
+                new terminalParameter(true,"Feedback type (0: encoder, 1: internal counter)","PS","1","8012","08"),
+                new terminalParameter(true,"Invert motor polarity (0:False 1:True)","PS","0","8012","09")
             };
         }
         //IEnumerator and IEnumerable require these methods.
@@ -210,214 +256,19 @@ namespace TwinCAT___Startup_Creator
         {
             return terminalParameterList[paramIndex];
         }
-
-/*
-        public terminalParameter i8000_08 = new terminalParameter
-        {
-            Include = false,
-            Name = "Enc settings - Disable fitler",
-            Transition = "PS",
-            Data = "0",
-            Index = "8000",
-            SubIndex = "08"
-        };
-        public terminalParameter i8000_0A = new terminalParameter
-        {
-            Include = false,
-            Name = "Enc settings - Enable microincrements",
-            Transition = "PS",
-            Data = "0",
-            Index = "8000",
-            SubIndex = "0A"
-        };
-        public terminalParameter i8000_0E = new terminalParameter
-        {
-            Include = false,
-            Name = "Enc settings - Reversion of rotation",
-            Transition = "PS",
-            Data = "0",
-            Index = "8000",
-            SubIndex = "0E"
-        };
-        public terminalParameter i8010_01 = new terminalParameter
-        {
-            Include = true,
-            Name = "Motor Settings - Max current (mA)",
-            Transition = "PS",
-            Data = "5000",
-            Index = "8010",
-            SubIndex = "01"
-        };
-        public terminalParameter i8010_02 = new terminalParameter
-        {
-            Include = true,
-            Name = "Motor Settings - Reduced current (mA)",
-            Transition = "PS",
-            Data = "2500",
-            Index = "8010",
-            SubIndex = "02"
-        };
-        public terminalParameter i8010_03 = new terminalParameter
-        {
-            Include = true,
-            Name = "Motor Settings - Nominal voltage (mV)",
-            Transition = "PS",
-            Data = "50000",
-            Index = "8010",
-            SubIndex = "03"
-        };
-        public terminalParameter i8010_04 = new terminalParameter
-        {
-            Include = true,
-            Name = "Motor Settings - Coil resistance (0.01Ohm)",
-            Transition = "PS",
-            Data = "100",
-            Index = "8010",
-            SubIndex = "04"
-        };
-        public terminalParameter i8010_05 = new terminalParameter
-        {
-            Include = false,
-            Name = "Motor Settings - Motor EMF (###)",
-            Transition = "PS",
-            Data = "0",
-            Index = "8010",
-            SubIndex = "05"
-        };
-        public terminalParameter i8010_06 = new terminalParameter
-        {
-            Include = true,
-            Name = "Motor Settings - Fullsteps",
-            Transition = "PS",
-            Data = "200",
-            Index = "8010",
-            SubIndex = "06"
-        };
-        public terminalParameter i8010_07 = new terminalParameter
-        {
-            Include = false,
-            Name = "Motor Settings - Encoder Increments (4-fold)",
-            Transition = "PS",
-            Data = "0",
-            Index = "8010",
-            SubIndex = "07"
-        };
-        public terminalParameter i90 = new terminalParameter(false, 
-            "Test", 
-            "PS", 
-            "5000", 
-            "8011", 
-            "01");
-        public terminalParameter i8011_01 = new terminalParameter
-        (
-            Include = false,
-            Name = "Controller Settings - Kp factor (curr) (###)",
-            Transition = "PS",
-            Data = "400",
-            Index = "8011",
-            SubIndex = "01"
-        );
-        public terminalParameter i8011_02 = new terminalParameter
-        {
-            Include = false,
-            Name = "Controller Settings - Ki factor (curr) (###)",
-            Transition = "PS",
-            Data = "4",
-            Index = "8011",
-            SubIndex = "02"
-        };
-        public terminalParameter i8011_03 = new terminalParameter
-        {
-            Include = false,
-            Name = "Controller Settings - Inner window (###)",
-            Transition = "PS",
-            Data = "0",
-            Index = "8011",
-            SubIndex = "03"
-        };
-        public terminalParameter i8011_05 = new terminalParameter
-        {
-            Include = false,
-            Name = "Controller Settings - Outer window (###)",
-            Transition = "PS",
-            Data = "0",
-            Index = "8011",
-            SubIndex = "05"
-        };
-        public terminalParameter i8011_06 = new terminalParameter
-        {
-            Include = false,
-            Name = "Controller Settings - Filter cut off frequency (###)",
-            Transition = "PS",
-            Data = "0",
-            Index = "8011",
-            SubIndex = "06"
-        };
-        public terminalParameter i8011_07 = new terminalParameter
-        {
-            Include = false,
-            Name = "Controller Settings - Ka factor (curr) (###)",
-            Transition = "PS",
-            Data = "100",
-            Index = "8011",
-            SubIndex = "07"
-        };
-        public terminalParameter i8011_08 = new terminalParameter
-        {
-            Include = false,
-            Name = "Controller Settings - Kd factor (curr) (###)",
-            Transition = "PS",
-            Data = "100",
-            Index = "8011",
-            SubIndex = "08"
-        };
-        public terminalParameter i8012_05 = new terminalParameter
-        {
-            Include = true,
-            Name = "Features - Speed Range (0:1k, 1:2k, 2:4k, 3:8k, 4:16k, 5:32k)",
-            Transition = "PS",
-            Data = "1",
-            Index = "8012",
-            SubIndex = "05"
-        };
-        public terminalParameter i8012_08 = new terminalParameter
-        {
-            Include = true,
-            Name = "Feedback type (0: encoder, 1: internal counter)",
-            Transition = "PS",
-            Data = "1",
-            Index = "8012",
-            SubIndex = "08"
-        };
-        public terminalParameter i8012_09 = new terminalParameter
-        {
-            Include = true,
-            Name = "Invert motor polarity",
-            Transition = "PS",
-            Data = "0",
-            Index = "8012",
-            SubIndex = "09"
-        };
-*/
     }
 
-    public class terminalParameter : INotifyPropertyChanged
+    public class terminalParameter
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         private bool _include = false;
         private string _name;
         private string _transition;
         private string _data;
         private string _index;
         private string _subindex;
-        private string _ccs = "1";
-        private string _timeout = "0";
-        public terminalParameter(bool Include, string Name, string Transition, string Data, string Index, string SubIndex, string CCS = "1", string timeout = "0")
+        private string _ccs;
+        private string _timeout;
+        public terminalParameter(bool Include, string Name, string Transition, string Data, string Index, string SubIndex, string CCS = "1", string Timeout = "0")
         {
             _include = Include;
             _name = Name;
@@ -432,16 +283,7 @@ namespace TwinCAT___Startup_Creator
         public bool Include
         {
             get { return _include; }
-            //set { _include = value; }
-            set
-            {
-                if (value != _include)
-                {
-                    _include = value;
-                    OnPropertyChanged();
-                }
-              
-            }
+            set { _include = value; }
         }
         public string Name
         {
@@ -477,8 +319,7 @@ namespace TwinCAT___Startup_Creator
         {
             get { return _timeout; }
             set { _timeout = value; }
-        }
-        
+        }       
     }
 
 }

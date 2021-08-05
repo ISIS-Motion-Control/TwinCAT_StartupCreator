@@ -1,20 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.ComponentModel;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Popups;
+﻿using System.ComponentModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
+using System.Collections.ObjectModel;
 using Windows.UI.Xaml.Navigation;
-using System.Runtime.CompilerServices;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -23,125 +12,102 @@ namespace TwinCAT___Startup_Creator
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public partial class EL7041 : Page, INotifyPropertyChanged
+    public partial class EL7041 : Page
     {
-        private async void messageBoxPopup(string text2show)
-        {
-            var messageDialog = new MessageDialog(text2show);
-            await messageDialog.ShowAsync();
-        }
-
+        
+        readonly ObservableCollection<string> ListOfTransitions = new ObservableCollection<string>() {"IP","PS","SP","SO","OS"};
         private TerminalEL7041 _terminalEL7041 = new TerminalEL7041();
         public TerminalEL7041 TerminalEL7041
         {
             get { return _terminalEL7041; }
             set { _terminalEL7041 = value; }
         }
-        public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged(string info)
+        private TerminalEL7041 testTerminal;
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(info));
-            }
+            testTerminal = (TerminalEL7041)e.Parameter;
+            base.OnNavigatedTo(e);
         }
 
-
-        public bool TestBool { get; set; }
-
-        
-        
-        
-        
-        string testString;
-        Binding testBind = new Binding();
-        Binding testBind2 = new Binding();
-
-        
         public EL7041()
         {
-            InitializeComponent();
-            this.DataContext = this;
-            int iRow = 4;
+            this.InitializeComponent();
+             
+            int iRow = 1;
 
-            testString = ((terminalParameter)TerminalEL7041.parameter(0)).Data;
-            //testBind.Source = ((terminalParameter)(((EL7041)DataContext).TerminalEL7041.parameter(0))).Include;
-            testBind.Source = this;
-            testBind.Path = new PropertyPath("TestBool");
-            testBind.Mode = BindingMode.TwoWay;
-            testBind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            //include1.SetBinding(ToggleSwitch.IsOnProperty, testBind);
-
-
-            testBind2.Source = TerminalEL7041.parameter(0);
-            //testBind2.Path = new PropertyPath("((terminalParameter)TerminalEL7041.parameter[0]).Include");
-            testBind2.Path = new PropertyPath("Include");
-            testBind2.Mode = BindingMode.TwoWay;
-            testBind2.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-            include1.SetBinding(ToggleSwitch.IsOnProperty, testBind2);
-            
-            //testBool = ((terminalParameter)TerminalEL7041.parameter(0)).Include;
-            
-            
-            List<ToggleSwitch> toggleSwitches = new List<ToggleSwitch>();
-            
             foreach (terminalParameter parameter in TerminalEL7041)
             {
-                ToggleSwitch toggleSwitch = new ToggleSwitch();
-                toggleSwitch.SetValue(Grid.ColumnProperty, 0);
-                toggleSwitch.SetValue(Grid.RowProperty, iRow);
-                //toggleSwitch.Toggled += new RoutedEventHandler(includeToggle1_Toggled);               
-               
                 Binding includeBind = new Binding();
+                Binding commentBind = new Binding();
+                Binding dataBind = new Binding();
+                Binding transitionBind = new Binding();
+
                 includeBind.Mode = BindingMode.TwoWay;
                 includeBind.Source = parameter;
                 includeBind.Path = new PropertyPath("Include");
                 includeBind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+                commentBind.Mode = BindingMode.OneWay;
+                commentBind.Source = parameter;
+                commentBind.Path = new PropertyPath("Name");
+
+                dataBind.Mode = BindingMode.TwoWay;
+                dataBind.Source = parameter;
+                dataBind.Path = new PropertyPath("Data");
+                dataBind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+                transitionBind.Mode = BindingMode.TwoWay;
+                transitionBind.Source = parameter;
+                transitionBind.Path = new PropertyPath("Transition");
+                transitionBind.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+                //create Include parameter toggles
+                ToggleSwitch toggleSwitch = new ToggleSwitch();
+                toggleSwitch.SetValue(Grid.ColumnProperty, 0);
+                toggleSwitch.SetValue(Grid.RowProperty, iRow);
+                toggleSwitch.Margin = new Thickness(5, 0, 0, 0);
+                toggleSwitch.OffContent = string.Empty;
+                toggleSwitch.OnContent = string.Empty;
+
+                //Create textblock for parameter name/comment
+                TextBlock textBlock = new TextBlock();
+                textBlock.SetValue(Grid.ColumnProperty, 1);
+                textBlock.SetValue(Grid.RowProperty, iRow);
+                textBlock.HorizontalAlignment = HorizontalAlignment.Stretch;
+                textBlock.VerticalAlignment = VerticalAlignment.Center;
+                textBlock.Margin = new Thickness(25, 0, 0, 0);
+
+                //Create textbox for data manipulation
+                TextBox textBox = new TextBox();
+                textBox.SetValue(Grid.ColumnProperty, 2);
+                textBox.SetValue(Grid.RowProperty, iRow);
+                textBox.HorizontalAlignment = HorizontalAlignment.Stretch;
+                textBox.VerticalAlignment = VerticalAlignment.Center;
+
+                //Create combobox for transition
+                ComboBox comboBox = new ComboBox();
+                comboBox.SetValue(Grid.ColumnProperty, 3);
+                comboBox.SetValue(Grid.RowProperty, iRow);
+                comboBox.HorizontalAlignment = HorizontalAlignment.Stretch;
+                comboBox.VerticalAlignment = VerticalAlignment.Center;
+                comboBox.Margin = new Thickness(5, 5, 5, 5);
+                comboBox.ItemsSource = ListOfTransitions;
+                
+                //Set data binds
                 BindingOperations.SetBinding(toggleSwitch, ToggleSwitch.IsOnProperty, includeBind);
+                BindingOperations.SetBinding(textBlock, TextBlock.TextProperty, commentBind);
+                BindingOperations.SetBinding(textBox, TextBox.TextProperty, dataBind);
+                BindingOperations.SetBinding(comboBox, ComboBox.SelectedItemProperty, transitionBind);
                 
                 iRow++;
                 grid.Children.Add(toggleSwitch);
-                toggleSwitches.Add(toggleSwitch);
+                grid.Children.Add(textBlock);
+                grid.Children.Add(textBox);
+                grid.Children.Add(comboBox);
             }
             
-        }
-
-        private void includeToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-            if (toggleSwitch != null)
-            {
-            }
-        }
-        private void includeToggle1_Toggled(object sender, RoutedEventArgs e)
-        {
-            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-            if (toggleSwitch != null)
-            {
-                messageBoxPopup(((terminalParameter)TerminalEL7041.parameter(0)).Include.ToString());
-                //messageBoxPopup(((terminalParameter)TerminalEL7041.parameter(0)).Include.ToString());
-            }
-        }
-
-
-        private void include1_Toggled(object sender, RoutedEventArgs e)
-        {
-            //terminalEL7041.i8000_08.Include = include1.IsOn;
-        }
-
-        private void data1_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            //terminalEL7041.i8000_08.Data = data1.Text;
-        }
-        private void data2_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            //terminalEL7041.i8000_0A.Data = data2.Text;
-        }
-        private void data3_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            //terminalEL7041.i8000_0E.Data = data3.Text;
         }
     }
 

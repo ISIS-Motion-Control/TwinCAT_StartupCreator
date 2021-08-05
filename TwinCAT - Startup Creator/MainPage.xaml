@@ -6,8 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <Grid Background="#FFA5E9F0" Style="{StaticResource HandwritingViewCandidatesBarStyle}">
+    Background="White">
+    <Grid Background="{ThemeResource SystemAccentColorDark1}" Style="{StaticResource HandwritingViewCandidatesBarStyle}" FocusVisualPrimaryBrush="{x:Null}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.01*"/>
             <ColumnDefinition Width="0.15*"/>
@@ -34,18 +34,6 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <ComboBox x:Name="terminalSelectionComboBox" 
-                  IsEditable="true" 
-                  ItemsSource="{x:Bind ListOfTerminals}"
-                  Background="White" 
-                  SelectionChanged="ComboBox_SelectionChanged" 
-                  PlaceholderText="Select Terminal..."
-                  Grid.Row="1"
-                  Grid.Column="0"
-                  VerticalAlignment="Center"
-                  HorizontalAlignment="Stretch"
-                  />
-
             <Button x:Name="directoryButton"
             Content="Pick directory for file creation" 
             Click="folderSelectButton_Click" 
@@ -56,6 +44,17 @@
             VerticalAlignment="Center"
             
         />
+            <ComboBox x:Name="terminalSelectionComboBox" 
+                  IsEditable="true" 
+                  ItemsSource="{x:Bind Path=ListOfTerminals}"
+                  Background="White" 
+                  SelectionChanged="ComboBox_SelectionChanged" 
+                  PlaceholderText="Select Terminal..."
+                  Grid.Row="1"
+                  Grid.Column="0"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Stretch"
+                  />
             <Button x:Name="testRunButton" 
             Content="Generate Startup File"  
             Style="{StaticResource AccentButtonStyle}"  
@@ -65,10 +64,10 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"          
         />
-            <TextBlock Text="File name:" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <TextBox x:Name="fileName" PlaceholderText="Enter File Name" HorizontalAlignment="Right" Width="200" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1"/>
-        
-        <Image Grid.Column="0" HorizontalAlignment="Center" Grid.Row="9" VerticalAlignment="Center" Source="/Assets/LargeTile.scale-100.png" />
+            <TextBlock Text="File name:" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}"/>
+            <TextBox x:Name="fileName" PlaceholderText="Enter File Name" HorizontalAlignment="Left" Width="176" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Margin="109,0,0,0"/>
+
+            <Image Grid.Column="0" HorizontalAlignment="Center" Grid.Row="9" VerticalAlignment="Center" Source="/Assets/LargeTile.scale-100.png" />
 
 
 
@@ -79,8 +78,8 @@
 
 
 
-        <Frame x:Name="terminalFrame" UseLayoutRounding="False" d:LayoutRounding="Auto" Background="#FFC9C9C9" BorderBrush="Black" Grid.Column="3" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:FieldModifier="public"/>
-        
+        <Frame x:Name="terminalFrame" UseLayoutRounding="False" d:LayoutRounding="Auto" BorderBrush="Black" Grid.Column="3" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:FieldModifier="public"/>
+
 
     </Grid>
 
