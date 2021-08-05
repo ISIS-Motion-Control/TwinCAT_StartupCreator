@@ -9,7 +9,7 @@
   <Identity
     Name="4c8f9bda-8536-4770-a095-b8c68905b4da"
     Publisher="CN=SCoop - Work"
-    Version="1.0.0.0" />
+    Version="1.0.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="4c8f9bda-8536-4770-a095-b8c68905b4da" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

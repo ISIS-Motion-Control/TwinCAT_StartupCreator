@@ -10,7 +10,6 @@ using System.Runtime.CompilerServices;
 using Windows.UI.Popups;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
 namespace TwinCAT___Startup_Creator
 {
     /* HOW TO ADD NEW TERMINALS
@@ -26,8 +25,8 @@ namespace TwinCAT___Startup_Creator
     /// Main display page for the COE startup creation tool
     /// </summary>
     public partial class MainPage : Page
-    {       
-        readonly ObservableCollection<string> ListOfTerminals = new ObservableCollection<string>() { "EL7041", "EL7047" }; //List of terminals currently supported in the tool that asks as a source fo combobox in UI
+    {
+        readonly ObservableCollection<string> ListOfTerminals = new ObservableCollection<string>() { "EL7041", "EL7047", "EL5101" }; //List of terminals currently supported in the tool that asks as a source fo combobox in UI
         string selectedTerminal; //Stores the value of the combobox (i.e. the user selection for terminal)
         const string quoteMark = "\""; //constant used for easier creation of strings where a quotation mark is required
         Windows.Storage.StorageFolder folder; //User selected directory for storing the XML output
@@ -35,10 +34,9 @@ namespace TwinCAT___Startup_Creator
         //Terminal pages - instances created as MainPage initialised      
         Page el7041Page;
         Page el7047Page;
+        Page el5101Page;
 
- 
         //Need to clean these up or find a better way to declare them - might just move to end or can I create another partial for MainPage and dump them there for ease of access
-
 
         /// <summary>
         /// Constructor for main page. Initialises and instances the terminal pages
@@ -52,6 +50,9 @@ namespace TwinCAT___Startup_Creator
 
             terminalEL7047 = new GenericTerminal(el7047ParameterList);
             el7047Page = new TerminalPage(terminalEL7047);
+
+            terminalEL5101 = new GenericTerminal(el5101ParameterList);
+            el5101Page = new TerminalPage(terminalEL5101);
         }
 
         /// <summary>
@@ -107,6 +108,22 @@ namespace TwinCAT___Startup_Creator
                     terminal4Startup = ((TerminalPage)el7047Page).Terminal;
                     terminal4Startup.Reset();
                     startupString = beckhoffBoilerPlateStart(startupString);
+                    foreach (terminalParameter param in terminal4Startup)   //Now we loop through the generic
+                    {
+                        if (param.Include)
+                        {
+                            startupString = beckhoffInitCmd(startupString, param);
+                        }
+                    }
+                    startupString = beckhoffBoilerPlateEnd(startupString);
+                    startupFile = await folder.CreateFileAsync(fileName.Text + @".xml", Windows.Storage.CreationCollisionOption.ReplaceExisting);
+                    await Windows.Storage.FileIO.WriteLinesAsync(startupFile, startupString);
+                    break;
+                case "EL5101":
+                    terminal4Startup = ((TerminalPage)el5101Page).Terminal;
+                    terminal4Startup.Reset();
+                    startupString = beckhoffBoilerPlateStart(startupString);
+                    //foreach (terminalParameter param in terminalEL7041)
                     foreach (terminalParameter param in terminal4Startup)   //Now we loop through the generic
                     {
                         if (param.Include)
@@ -201,10 +218,11 @@ namespace TwinCAT___Startup_Creator
                 case "EL7047":
                     terminalFrame.Content = el7047Page;
                     break;
+                case "EL5101":
+                    terminalFrame.Content = el5101Page;
+                    break;
             }
         }
-
-        
 
         /// <summary>
         /// Method for selecting a directory to export startup xml to
@@ -332,7 +350,6 @@ namespace TwinCAT___Startup_Creator
         }
     }
 
-
     public class TerminalEL7041 : IEnumerator,IEnumerable
     {
         private terminalParameter[] terminalParameterList;
@@ -389,7 +406,4 @@ namespace TwinCAT___Startup_Creator
             return terminalParameterList[paramIndex];
         }
     }
-
-    
-
 }

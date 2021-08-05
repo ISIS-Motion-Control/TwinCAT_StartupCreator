@@ -67,7 +67,7 @@
             <TextBlock Text="File name:" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}"/>
             <TextBox x:Name="fileName" PlaceholderText="Enter File Name" HorizontalAlignment="Left" Width="176" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Margin="109,0,0,0"/>
 
-            <Image Grid.Column="0" HorizontalAlignment="Center" Grid.Row="9" VerticalAlignment="Center" Source="/Assets/LargeTile.scale-100.png" />
+            <Image Grid.Column="0" HorizontalAlignment="Center" Grid.Row="9" VerticalAlignment="Center" Source="/Assets/bongoCatGif.gif" />
 
 
 
