@@ -57,7 +57,9 @@ namespace TwinCAT___Startup_Creator
             List<string> startupString = new List<string>(); 
             selectedTerminal = terminalSelectionComboBox.SelectedItem.ToString();
             GenericTerminal terminal4Startup;
-            
+            Windows.Storage.StorageFile testFile;
+
+
             switch (selectedTerminal)
             {
                 case "EL7041":
@@ -78,7 +80,23 @@ namespace TwinCAT___Startup_Creator
                         }
                     }
                     startupString = beckhoffBoilerPlateEnd(startupString);
-                    Windows.Storage.StorageFile testFile = await folder.CreateFileAsync(fileName.Text + @".xml", Windows.Storage.CreationCollisionOption.ReplaceExisting);
+                    testFile = await folder.CreateFileAsync(fileName.Text + @".xml", Windows.Storage.CreationCollisionOption.ReplaceExisting);
+                    await Windows.Storage.FileIO.WriteLinesAsync(testFile, startupString);
+                    break;
+                
+                case "Technosoft 8020":
+                    terminal4Startup = ((EL7041)techno8020).GenericTerminal;
+                    terminal4Startup.Reset();
+                    startupString = beckhoffBoilerPlateStart(startupString);
+                    foreach (terminalParameter param in terminal4Startup)   //Now we loop through the generic
+                    {
+                        if (param.Include)
+                        {
+                            startupString = beckhoffInitCmd(startupString, param);
+                        }
+                    }
+                    startupString = beckhoffBoilerPlateEnd(startupString);
+                    testFile = await folder.CreateFileAsync(fileName.Text + @".xml", Windows.Storage.CreationCollisionOption.ReplaceExisting);
                     await Windows.Storage.FileIO.WriteLinesAsync(testFile, startupString);
                     break;
             }
