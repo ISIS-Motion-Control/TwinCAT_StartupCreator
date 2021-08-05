@@ -119,8 +119,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EL7041.xaml.cs">
-      <DependentUpon>EL7041.xaml</DependentUpon>
+    <Compile Include="TerminalPage.xaml.cs">
+      <DependentUpon>TerminalPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -129,6 +129,8 @@
     <Compile Include="technosoft8020.xaml.cs">
       <DependentUpon>technosoft8020.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Terminals\terminalEL7047.cs" />
+    <Compile Include="Terminals\terminalEL7041.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -194,7 +196,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="EL7041.xaml">
+    <Page Include="TerminalPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

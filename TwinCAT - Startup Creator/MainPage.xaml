@@ -48,7 +48,7 @@
                   IsEditable="true" 
                   ItemsSource="{x:Bind Path=ListOfTerminals}"
                   Background="White" 
-                  SelectionChanged="ComboBox_SelectionChanged" 
+                  SelectionChanged="terminalComboBox_SelectionChanged" 
                   PlaceholderText="Select Terminal..."
                   Grid.Row="1"
                   Grid.Column="0"

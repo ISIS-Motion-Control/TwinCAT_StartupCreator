@@ -10,37 +10,43 @@ using Windows.UI.Xaml.Navigation;
 namespace TwinCAT___Startup_Creator
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// A generic page for generating a parameter list and user interface for a given terminal
     /// </summary>
-    public partial class EL7041 : Page
+    public partial class TerminalPage : Page
     {
-
+        //List of transitions created as source for combobox elements in display
         readonly ObservableCollection<string> ListOfTransitions = new ObservableCollection<string>() { "IP", "PS", "SP", "SO", "OS" };
-        private GenericTerminal _genericTerminal;
-        public GenericTerminal GenericTerminal
+        
+        private GenericTerminal _terminal;
+        /// <summary>
+        /// Method for accessing the terminal parameter data set by the user
+        /// </summary>
+        public GenericTerminal Terminal
         {
-            get { return _genericTerminal; }
-            set { _genericTerminal = value; }
-        }
-        private TerminalEL7041 _terminalEL7041 = new TerminalEL7041();
-        public TerminalEL7041 TerminalEL7041
-        {
-            get { return _terminalEL7041; }
-            set { _terminalEL7041 = value; }
+            get { return _terminal; }
+            set { _terminal = value; }
         }
 
-        public EL7041(GenericTerminal inputTerminal)
+        /// <summary>
+        /// Class constructor. Requires an input of the terminal type to display parameters for
+        /// </summary>
+        /// <param name="inputTerminal"></param>
+        public TerminalPage(GenericTerminal inputTerminal)
         {
             this.InitializeComponent();
-            GenericTerminal = inputTerminal; 
+            Terminal = inputTerminal; 
             populatePage();
         }
 
+        
+        /// <summary>
+        /// Method for populating the page with XAML elements for user interaction.
+        /// Uses the local Terminal value
+        /// </summary>
         public void populatePage()
         {
             int iRow = 1;
-            //foreach (terminalParameter parameter in TerminalEL7041)
-            foreach (terminalParameter parameter in GenericTerminal)
+            foreach (terminalParameter parameter in Terminal)
             {
                 Binding includeBind = new Binding();
                 Binding commentBind = new Binding();
