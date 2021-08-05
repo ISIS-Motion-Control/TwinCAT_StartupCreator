@@ -14,8 +14,14 @@ namespace TwinCAT___Startup_Creator
     /// </summary>
     public partial class EL7041 : Page
     {
-        
-        readonly ObservableCollection<string> ListOfTransitions = new ObservableCollection<string>() {"IP","PS","SP","SO","OS"};
+
+        readonly ObservableCollection<string> ListOfTransitions = new ObservableCollection<string>() { "IP", "PS", "SP", "SO", "OS" };
+        private GenericTerminal _genericTerminal;
+        public GenericTerminal GenericTerminal
+        {
+            get { return _genericTerminal; }
+            set { _genericTerminal = value; }
+        }
         private TerminalEL7041 _terminalEL7041 = new TerminalEL7041();
         public TerminalEL7041 TerminalEL7041
         {
@@ -23,21 +29,18 @@ namespace TwinCAT___Startup_Creator
             set { _terminalEL7041 = value; }
         }
 
-        private TerminalEL7041 testTerminal;
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            testTerminal = (TerminalEL7041)e.Parameter;
-            base.OnNavigatedTo(e);
-        }
-
-        public EL7041()
+        public EL7041(GenericTerminal inputTerminal)
         {
             this.InitializeComponent();
-             
-            int iRow = 1;
+            GenericTerminal = inputTerminal; 
+            populatePage();
+        }
 
-            foreach (terminalParameter parameter in TerminalEL7041)
+        public void populatePage()
+        {
+            int iRow = 1;
+            //foreach (terminalParameter parameter in TerminalEL7041)
+            foreach (terminalParameter parameter in GenericTerminal)
             {
                 Binding includeBind = new Binding();
                 Binding commentBind = new Binding();
@@ -94,21 +97,20 @@ namespace TwinCAT___Startup_Creator
                 comboBox.VerticalAlignment = VerticalAlignment.Center;
                 comboBox.Margin = new Thickness(5, 5, 5, 5);
                 comboBox.ItemsSource = ListOfTransitions;
-                
+
                 //Set data binds
                 BindingOperations.SetBinding(toggleSwitch, ToggleSwitch.IsOnProperty, includeBind);
                 BindingOperations.SetBinding(textBlock, TextBlock.TextProperty, commentBind);
                 BindingOperations.SetBinding(textBox, TextBox.TextProperty, dataBind);
                 BindingOperations.SetBinding(comboBox, ComboBox.SelectedItemProperty, transitionBind);
-                
+
                 iRow++;
                 grid.Children.Add(toggleSwitch);
                 grid.Children.Add(textBlock);
                 grid.Children.Add(textBox);
                 grid.Children.Add(comboBox);
             }
-            
         }
-    }
 
+    }
 }

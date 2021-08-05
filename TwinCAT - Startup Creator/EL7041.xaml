@@ -5,7 +5,8 @@
     xmlns:local="using:TwinCAT___Startup_Creator"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" Background="#FF94E2FF" >
+    mc:Ignorable="d" Background="#FF94E2FF" 
+    NavigationCacheMode="Disabled">
 
     <Grid x:Name="grid" >
         <Grid.RowDefinitions>

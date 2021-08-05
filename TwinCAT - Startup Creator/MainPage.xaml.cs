@@ -22,15 +22,23 @@ namespace TwinCAT___Startup_Creator
         string selectedTerminal;
         public XmlDocument xmlDoc;
         const string quoteMark = "\"";
-        private terminalParameter[] terminalParameterList = new terminalParameter[] { new terminalParameter(false, "Enc settings - Disable filter (0:False 1:True)", "PS", "0", "8000", "08") };
+        private terminalParameter[] terminalParameterList1 = new terminalParameter[] { new terminalParameter(false, "Enc settings - Disable filter (0:False 1:True)", "PS", "0", "8000", "08") };
+        private terminalParameter[] terminalParameterList2 = new terminalParameter[] { new terminalParameter(false, "Enc settings - Disable filter (0:False 1:True)", "PS", "0", "8000", "08"), new terminalParameter(false, "Enc settings - Disable filter (0:False 1:True)", "PS", "0", "8000", "08") };
+        private GenericTerminal genericTerminal1;
+        private GenericTerminal genericTerminal2;
         TerminalEL7041 testEL7041 = new TerminalEL7041();
+        Page techno8020;
+        Page el7041;
 
         Windows.Storage.StorageFolder folder;
 
         public MainPage()
         {
             this.InitializeComponent();
-            GenericTerminal genericTerminal = new GenericTerminal(terminalParameterList);
+            genericTerminal1 = new GenericTerminal(terminalParameterList1);
+            genericTerminal2 = new GenericTerminal(terminalParameterList2);
+            techno8020 = new EL7041(genericTerminal1);
+            el7041 = new EL7041(genericTerminal2);
         }
 
         private async void messageBoxPopup(string text2show)
@@ -39,13 +47,6 @@ namespace TwinCAT___Startup_Creator
             await messageDialog.ShowAsync();
         }
 
-        //TESTING CODE HERE
-
-
-        
-
-        //TO HERE
-        /// ////////////////////////////////////////////////////////
         private async void generateStartupButton_Click(object sender, RoutedEventArgs e)
         {
             if (folder==null)
@@ -55,15 +56,21 @@ namespace TwinCAT___Startup_Creator
             }
             List<string> startupString = new List<string>(); 
             selectedTerminal = terminalSelectionComboBox.SelectedItem.ToString();
+            GenericTerminal terminal4Startup;
+            
             switch (selectedTerminal)
             {
                 case "EL7041":
                     EL7041 el7041Page = (EL7041)terminalFrame.Content;
                     TerminalEL7041 terminalEL7041 = el7041Page.TerminalEL7041;
 
+                    terminal4Startup = ((EL7041)el7041).GenericTerminal;
+                    terminal4Startup.Reset();
+                    
                     startupString = beckhoffBoilerPlateStart(startupString);
                     terminalEL7041.Reset();
-                    foreach (terminalParameter param in terminalEL7041)
+                    //foreach (terminalParameter param in terminalEL7041)
+                    foreach (terminalParameter param in terminal4Startup)   //Now we loop through the generic
                     {
                         if( param.Include)
                         {
@@ -128,7 +135,6 @@ namespace TwinCAT___Startup_Creator
 
 
 
-
 /////////////////////////////////////////////////////////////
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -137,10 +143,12 @@ namespace TwinCAT___Startup_Creator
             switch (selectedTerminal)
             {
                 case "EL7041":
-                    terminalFrame.Navigate(typeof(EL7041),testEL7041);
+                    terminalFrame.Content = el7041;
+                    //terminalFrame.Navigate(typeof(EL7041));
                     break;
                 case "Technosoft 8020":
-                    terminalFrame.Navigate(typeof(technosoft8020));
+                    terminalFrame.Content = techno8020;
+                    //terminalFrame.Navigate(typeof(technosoft8020));
                     break;
             }
         }
